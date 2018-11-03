@@ -1,5 +1,5 @@
 #import FileIO
-import sys, os.path
+import sys, os.path,operator
 
 minSupport = -1
 numberOfLines = -1
@@ -19,6 +19,7 @@ def Main():
     print("Minsup:", minSupport)
     Trim()
     print(CountDictionary)
+    print(SortDictionary())
 
 #get and manipulate arguemnts
 def GetArguments():
@@ -38,8 +39,6 @@ def readFile(fileName):
             a = file.readline().split()
             a = a[2:]
             CheckDictionary(a)
-
-
         file.close()
         return file
     else:
@@ -65,6 +64,29 @@ def Trim():
             Delete.append(x)
     for x in Delete:
         CountDictionary.pop(x)
+
+#sorts the dictionary based on values.
+def SortDictionary():
+    return sorted(CountDictionary.items(),key=operator.itemgetter(1))
+
+
+def CreateTree():
+    print("Todo")
+
+def SortTransactions():
+    print("Todo")
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 Main()
