@@ -2,8 +2,9 @@ import sys, os.path,operator
 
 minSupport = -1
 numberOfLines = -1
+Root = 1
 listOfNodes = []
-
+allowedItems = []
 #dictionary to store the amount:
 CountDictionary = {}
 
@@ -13,14 +14,15 @@ CountDictionary = {}
 #Main Runner of the code
 def Main():
     addRoot()
-    global minSupport
+    print(Root.data)
+    global minSupport,allowedItems
     arguments = GetArguments()
     currentFile = readFile(arguments[1])
     minSupport = (int) (numberOfLines) * ((int) (arguments[2]) / 100)
     print("Minsup:", minSupport)
     Trim()
     print(CountDictionary)
-    print(SortDictionary())
+    allowedItems = SortDictionary()
     FPGrowth(arguments[1])
 
 #get and manipulate arguemnts
@@ -70,14 +72,23 @@ def SortDictionary():
 #creates the tree structure
 def CreateTree(Transaction):
 
-    global listOfNodes
+    global Root,listOfNodes,allowedItems
     for i in range(0,len(Transaction)):
-        listOfNodes.append(Node(Transaction[i],1))
-    print(listOfNodes)
+        if Transaction[i] in allowedItems:
+            listOfNodes.append(Node(Transaction[i],1))
+    # for i in range(1,len(listOfNodes)):
+
+    # print(listOfNodes)
 
 
-def SortTransactions():
-    print("Todo")
+def SortTransactions(Transaction):
+    newTransaction = []
+    for x in allowedItems:
+        if x in Transaction:
+            newTransaction.append(x)
+    print("Old Transaction: ", Transaction)
+    print("New Transaction: ",newTransaction)
+    return newTransaction
 
 def FPGrowth(fileName):
     readIntoTree(fileName)
@@ -97,12 +108,14 @@ def readIntoTree(fileName):
     for i in range(0,int(file.readline())):
         a = file.readline().split()
         a = a[2:]
+        a = SortTransactions(a)
         CreateTree(a)
-
+    for x in listOfNodes:
+        print(x.data,",",x.amount)
+#just addes a root node to the list
 def addRoot():
-    global listOfNodes
-    root = Node("*", 0)
-    listOfNodes.append(root)
+    global Root
+    Root = Node("*", 0)
 
 
 
