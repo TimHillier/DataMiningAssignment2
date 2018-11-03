@@ -30,11 +30,8 @@ def GetArguments():
 def readFile(fileName):
     global numberOfLines
     if(os.path.isfile(fileName)):
-
-        file = open(fileName,"r")
-
+        file = open(fileName, "r")
         numberOfLines = int(file.readline())
-
         for i in range (0,numberOfLines):
             a = file.readline().split()
             a = a[2:]
@@ -42,7 +39,8 @@ def readFile(fileName):
         file.close()
         return file
     else:
-        print("Not a file Path")
+        print(fileName + " Not a file Path")
+        exit(1)
 
 #check the dictionary and if they exist increase counter else ignore
 def CheckDictionary(Elements):
@@ -69,7 +67,7 @@ def Trim():
 def SortDictionary():
     return sorted(CountDictionary.items(),key=operator.itemgetter(1))
 
-
+#creates the tree structure
 def CreateTree():
     print("Todo")
 
