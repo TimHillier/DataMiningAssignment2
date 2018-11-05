@@ -1,8 +1,10 @@
-import sys, os.path,operator
+import sys, os.path
+from anytree import Node,RenderTree
 
 minSupport = -1
 numberOfLines = -1
-Root = 1
+Root = Node("Root")
+lastNode = Root
 listOfNodes = []
 allowedItems = []
 #dictionary to store the amount:
@@ -13,8 +15,8 @@ CountDictionary = {}
 
 #Main Runner of the code
 def Main():
-    addRoot()
-    print(Root.data)
+    # addRoot()
+    # print(Root.data)
     global minSupport,allowedItems
     arguments = GetArguments()
     currentFile = readFile(arguments[1])
@@ -24,6 +26,8 @@ def Main():
     print(CountDictionary)
     allowedItems = SortDictionary()
     FPGrowth(arguments[1])
+    print(RenderTree(Root))
+    print("amount",listOfNodes[3].name)
 
 #get and manipulate arguemnts
 def GetArguments():
@@ -71,14 +75,70 @@ def SortDictionary():
 
 #creates the tree structure
 def CreateTree(Transaction):
-
-    global Root,listOfNodes,allowedItems
+    global Root,listOfNodes,allowedItems,lastNode
+    approved = []
     for i in range(0,len(Transaction)):
         if Transaction[i] in allowedItems:
-            listOfNodes.append(Node(Transaction[i],1))
-    # for i in range(1,len(listOfNodes)):
+            approved.append(Transaction[i])
+   #need to figure out which node is the root
+    current = findLowest(approved,Root)
 
-    # print(listOfNodes)
+    # for i in range(0,len(Root.children)):
+    #     if(Root.children[i].name == approved[0]):
+    #         current = Root.children[i]
+            # current.amount+=1
+
+
+    # print("Approved", approved)
+
+    #
+    # #turn approved into nodes
+    # for i in range(0,len(approved)):
+    #     current = Node(approved[i],parent=lastNode,amount=1)
+    #     for a in range(0,len(Root.children)):
+    #         if(Root.children[a].name == current.name):
+    #             Root.children[a].amount += 1
+    #         else:
+    #             current = Root
+    #
+    addNodes(approved,current)
+
+def findLowest(approvedNodes,currntNode):
+    lowestNode = currntNode
+    if approvedNodes == []:
+        return lowestNode
+    if currntNode.children == []:
+        return lowestNode
+    for i in range(0,len(currntNode.children)):
+        if(currntNode.children[i].name == approvedNodes[0]):
+            del approvedNodes[0]
+            currntNode.children[i].amount +=1
+            currntNode=currntNode.children[i]
+            lowestNode = findLowest(approvedNodes,currntNode)
+        break
+    return lowestNode
+#
+
+
+def addNodes(approvedNodes, currntNode):
+    if approvedNodes == []:
+        return
+    elif currntNode.name == approvedNodes[0]:
+        currntNode.amount += 1
+        print("Added one to: " + currntNode.name)
+        del approvedNodes[0]
+        addNodes(approvedNodes,currntNode)
+    else:
+        newNode = Node(approvedNodes[0],parent=currntNode,amount=1)
+        del approvedNodes[0]
+        listOfNodes.append(newNode)
+        addNodes(approvedNodes,newNode)
+
+
+
+
+def addToTree():
+    global Root,listOfNodes
 
 
 def SortTransactions(Transaction):
@@ -86,8 +146,8 @@ def SortTransactions(Transaction):
     for x in allowedItems:
         if x in Transaction:
             newTransaction.append(x)
-    print("Old Transaction: ", Transaction)
-    print("New Transaction: ",newTransaction)
+    # print("Old Transaction: ", Transaction)
+    # print("New Transaction: ",newTransaction)
     return newTransaction
 
 def FPGrowth(fileName):
@@ -110,29 +170,61 @@ def readIntoTree(fileName):
         a = a[2:]
         a = SortTransactions(a)
         CreateTree(a)
-    for x in listOfNodes:
-        print(x.data,",",x.amount)
 #just addes a root node to the list
 def addRoot():
     global Root
     Root = Node("*", 0)
+
+def joinNodes(parent, child):
+    parent.add_child(child)
+
+def printTree(node):
+
+
+    if(node.children == []):
+        print(node.data, " --> ",node.children)
+    else:
+        for i in range(0,len(node.children)):
+            printTree(node.children[i])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 #for the tree
 #how the hell do I do classes? is this correct?
 
-class Node(object):
-    def __init__(self,data,amount):
-        self.data = data
-        self.amount = amount
-        self.children = []
-
-    def add_child(self,obj):
-        self.children.append(obj)
-
-    def increase_amount(self):
-        self.amount = self.amount + 1
+# class Node(object):
+#     def __init__(self,data,amount):
+#         self.data = data
+#         self.amount = int(amount)
+#         self.children = []
+#         self.children_data = []
+#
+#     def add_child(self,obj):
+#         self.children.append(obj)
+#
+#     def add_child_data(self,inf):
+#         self.children_data.append(inf)
+#
+#     def increase_amount(self):
+#         self.amount = self.amount + 1
+#
+#     # def Traverse(self,root):
 
 
 
