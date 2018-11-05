@@ -15,8 +15,6 @@ CountDictionary = {}
 
 #Main Runner of the code
 def Main():
-    # addRoot()
-    # print(Root.data)
     global minSupport,allowedItems
     arguments = GetArguments()
     currentFile = readFile(arguments[1])
@@ -80,27 +78,10 @@ def CreateTree(Transaction):
     for i in range(0,len(Transaction)):
         if Transaction[i] in allowedItems:
             approved.append(Transaction[i])
-   #need to figure out which node is the root
+
+   #Get to the lowest possible Node
     current = findLowest(approved,Root)
 
-    # for i in range(0,len(Root.children)):
-    #     if(Root.children[i].name == approved[0]):
-    #         current = Root.children[i]
-            # current.amount+=1
-
-
-    # print("Approved", approved)
-
-    #
-    # #turn approved into nodes
-    # for i in range(0,len(approved)):
-    #     current = Node(approved[i],parent=lastNode,amount=1)
-    #     for a in range(0,len(Root.children)):
-    #         if(Root.children[a].name == current.name):
-    #             Root.children[a].amount += 1
-    #         else:
-    #             current = Root
-    #
     addNodes(approved,current)
 
 def findLowest(approvedNodes,currntNode):
@@ -117,7 +98,6 @@ def findLowest(approvedNodes,currntNode):
             lowestNode = findLowest(approvedNodes,currntNode)
         break
     return lowestNode
-#
 
 
 def addNodes(approvedNodes, currntNode):
@@ -125,7 +105,6 @@ def addNodes(approvedNodes, currntNode):
         return
     elif currntNode.name == approvedNodes[0]:
         currntNode.amount += 1
-        print("Added one to: " + currntNode.name)
         del approvedNodes[0]
         addNodes(approvedNodes,currntNode)
     else:
@@ -134,11 +113,6 @@ def addNodes(approvedNodes, currntNode):
         listOfNodes.append(newNode)
         addNodes(approvedNodes,newNode)
 
-
-
-
-def addToTree():
-    global Root,listOfNodes
 
 
 def SortTransactions(Transaction):
@@ -170,10 +144,7 @@ def readIntoTree(fileName):
         a = a[2:]
         a = SortTransactions(a)
         CreateTree(a)
-#just addes a root node to the list
-def addRoot():
-    global Root
-    Root = Node("*", 0)
+
 
 def joinNodes(parent, child):
     parent.add_child(child)
@@ -189,42 +160,6 @@ def printTree(node):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#for the tree
-#how the hell do I do classes? is this correct?
-
-# class Node(object):
-#     def __init__(self,data,amount):
-#         self.data = data
-#         self.amount = int(amount)
-#         self.children = []
-#         self.children_data = []
-#
-#     def add_child(self,obj):
-#         self.children.append(obj)
-#
-#     def add_child_data(self,inf):
-#         self.children_data.append(inf)
-#
-#     def increase_amount(self):
-#         self.amount = self.amount + 1
-#
-#     # def Traverse(self,root):
 
 
 
