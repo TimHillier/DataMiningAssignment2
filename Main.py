@@ -23,13 +23,12 @@ def Main():
     Trim()
     print(CountDictionary)
     allowedItems = SortDictionary()
+    print("Allowed: ", allowedItems)
     FPGrowth(arguments[1])
     print(RenderTree(Root))
-    print("amount",listOfNodes[3].name)
 
 #get and manipulate arguemnts
 def GetArguments():
-    print("arguments: " + str(sys.argv))
     return sys.argv
 
 #Reads files into the code
@@ -81,7 +80,7 @@ def CreateTree(Transaction):
 
    #Get to the lowest possible Node
     current = findLowest(approved,Root)
-
+    #add nodes to the tree
     addNodes(approved,current)
 
 def findLowest(approvedNodes,currntNode):
@@ -101,6 +100,7 @@ def findLowest(approvedNodes,currntNode):
 
 
 def addNodes(approvedNodes, currntNode):
+    print("current Node",currntNode)
     if approvedNodes == []:
         return
     elif currntNode.name == approvedNodes[0]:
@@ -126,7 +126,21 @@ def SortTransactions(Transaction):
 
 def FPGrowth(fileName):
     readIntoTree(fileName)
+    findFrequentItemSets()
 
+def findFrequentItemSets():
+    global allowedItems
+    reversedAllowedItems = allowedItems[::-1]
+    #find lowest value node
+
+
+
+    print("rev: ", reversedAllowedItems)
+    # lastNode = findBottom(NameOfNode)
+
+def findBottom(NameOfNode):
+    print("Bottom")
+    return NameOfNode
 def readIntoDictionary(fileName):
     global numberOfLines
     file = open(fileName, "r")
@@ -144,19 +158,6 @@ def readIntoTree(fileName):
         a = a[2:]
         a = SortTransactions(a)
         CreateTree(a)
-
-
-def joinNodes(parent, child):
-    parent.add_child(child)
-
-def printTree(node):
-
-
-    if(node.children == []):
-        print(node.data, " --> ",node.children)
-    else:
-        for i in range(0,len(node.children)):
-            printTree(node.children[i])
 
 
 

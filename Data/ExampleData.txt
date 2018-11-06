@@ -1,0 +1,11 @@
+10
+1   2   A B
+2   3   B C D
+3   4   A C D E
+4   3   A D E
+5   3   A B C
+6   4   A B C D
+7   1   A
+8   3   A B C
+9   3   A B D
+10  3   B C E
