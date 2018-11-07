@@ -7,8 +7,11 @@ Root = Node("Root")
 lastNode = Root
 listOfNodes = []
 allowedItems = []
+frequentItemSets = []
 #dictionary to store the amount:
 CountDictionary = {}
+#make the header table a dictionary?
+HeaderTable = {}
 
 
 
@@ -18,14 +21,17 @@ def Main():
     global minSupport,allowedItems
     arguments = GetArguments()
     currentFile = readFile(arguments[1])
-    minSupport = (int) (numberOfLines) * ((int) (arguments[2]) / 100)
+    minSupport = int((numberOfLines) * ((int) (arguments[2]) / 100))
     print("Minsup:", minSupport)
-    Trim()
+    # Trim()
+    CreateHeaderTable()
     print(CountDictionary)
+
     allowedItems = SortDictionary()
     print("Allowed: ", allowedItems)
     FPGrowth(arguments[1])
     print(RenderTree(Root))
+    print(HeaderTable)
 
 #get and manipulate arguemnts
 def GetArguments():
@@ -52,6 +58,7 @@ def CheckDictionary(Elements):
             CountDictionary.update({Elements[i]:x})
 
 #trim the dictionary for elements that are below the minimum support
+#not sure if this is actually needed based on how FP-growth works
 def Trim():
     Delete = []
     for x,y in CountDictionary.items():
@@ -68,6 +75,12 @@ def SortDictionary():
         sortedkeys.append(x[0])
     return sortedkeys
 
+#create empty Header Table
+def CreateHeaderTable():
+    for x in CountDictionary:
+        HeaderTable[x] = []
+
+
 
 
 #creates the tree structure
@@ -81,26 +94,30 @@ def CreateTree(Transaction):
    #Get to the lowest possible Node
     current = findLowest(approved,Root)
     #add nodes to the tree
+    # print("Current Transaction: ", approved, "\n current: ",current)
     addNodes(approved,current)
 
 def findLowest(approvedNodes,currntNode):
+    # print("approved: ",approvedNodes)
     lowestNode = currntNode
     if approvedNodes == []:
+        # print("X")
         return lowestNode
     if currntNode.children == []:
+        # print("Y")
         return lowestNode
+    # print(currntNode.name," Children:", currntNode.children)
     for i in range(0,len(currntNode.children)):
         if(currntNode.children[i].name == approvedNodes[0]):
             del approvedNodes[0]
             currntNode.children[i].amount +=1
             currntNode=currntNode.children[i]
             lowestNode = findLowest(approvedNodes,currntNode)
-        break
+            break
     return lowestNode
 
-
+#add node to the tree if it doesnt exist otherwise increase amount
 def addNodes(approvedNodes, currntNode):
-    print("current Node",currntNode)
     if approvedNodes == []:
         return
     elif currntNode.name == approvedNodes[0]:
@@ -108,10 +125,19 @@ def addNodes(approvedNodes, currntNode):
         del approvedNodes[0]
         addNodes(approvedNodes,currntNode)
     else:
-        newNode = Node(approvedNodes[0],parent=currntNode,amount=1)
+        newNode = Node(approvedNodes[0], parent=currntNode, amount=1)
+        addToHeaderTable(newNode)
         del approvedNodes[0]
         listOfNodes.append(newNode)
         addNodes(approvedNodes,newNode)
+
+
+#add node to header table
+def addToHeaderTable(NodeToAdd):
+    if(NodeToAdd.name in HeaderTable):
+        x = HeaderTable[NodeToAdd.name]
+        x.append(NodeToAdd)
+        HeaderTable.update({NodeToAdd.name:x})
 
 
 
@@ -132,11 +158,22 @@ def findFrequentItemSets():
     global allowedItems
     reversedAllowedItems = allowedItems[::-1]
     #find lowest value node
-
-
-
     print("rev: ", reversedAllowedItems)
-    # lastNode = findBottom(NameOfNode)
+    find(reversedAllowedItems)
+
+def find(itemset):
+    if(itemset == []):
+        return
+    print(itemset)
+    if(CountDictionary[itemset[0]] < minSupport):
+        print("Deleting:",itemset[0])
+        del itemset[0]
+        find(itemset)
+    else:
+        print("k")
+
+
+
 
 def findBottom(NameOfNode):
     print("Bottom")
