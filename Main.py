@@ -31,7 +31,11 @@ def Main():
     print("Allowed: ", allowedItems)
     FPGrowth(arguments[1])
     print(RenderTree(Root))
-    print(HeaderTable)
+    # print(HeaderTable)
+    for a in HeaderTable.keys():
+        getParents(HeaderTable.get(a))
+
+
 
 #get and manipulate arguemnts
 def GetArguments():
@@ -139,8 +143,18 @@ def addToHeaderTable(NodeToAdd):
         x.append(NodeToAdd)
         HeaderTable.update({NodeToAdd.name:x})
 
+def printParents(Child):
+    print(Child.name," Parents:")
+    print(Child.parent)
+
+#accepts the array of nodes of specific child
+def getParents(childFromDictionary):
+    for i in range(0,len(childFromDictionary)):
+        printParents(childFromDictionary[i])
+        print(childFromDictionary[i].amount)
 
 
+#sort transactions according to number of occurances
 def SortTransactions(Transaction):
     newTransaction = []
     for x in allowedItems:
@@ -150,10 +164,12 @@ def SortTransactions(Transaction):
     # print("New Transaction: ",newTransaction)
     return newTransaction
 
+#create the fpGrowth tree
 def FPGrowth(fileName):
     readIntoTree(fileName)
     findFrequentItemSets()
 
+#this might be wrong?
 def findFrequentItemSets():
     global allowedItems
     reversedAllowedItems = allowedItems[::-1]
@@ -171,13 +187,7 @@ def find(itemset):
         find(itemset)
     else:
         print("k")
-
-
-
-
-def findBottom(NameOfNode):
-    print("Bottom")
-    return NameOfNode
+#read the file into the count dictionary
 def readIntoDictionary(fileName):
     global numberOfLines
     file = open(fileName, "r")
@@ -188,6 +198,7 @@ def readIntoDictionary(fileName):
         CheckDictionary(a)
     file.close()
 
+#read the file into the tree structure
 def readIntoTree(fileName):
     file = open(fileName,"r")
     for i in range(0,int(file.readline())):
