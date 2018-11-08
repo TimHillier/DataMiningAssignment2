@@ -7,6 +7,7 @@ lastNode = Root
 listOfNodes = []
 allowedItems = []
 frequentItemSets = []
+frequentDictionary = {}
 #dictionary to store the amount:
 CountDictionary = {}
 #make the header table a dictionary?
@@ -29,7 +30,7 @@ def Main():
     allowedItems = SortDictionary()
     print("Allowed: ", allowedItems)
     FPGrowth(arguments[1])
-    print(RenderTree(Root))
+    # print(RenderTree(Root))
     # print(HeaderTable)
     # for a in HeaderTable.keys():
         # getParents(HeaderTable.get(a))
@@ -146,26 +147,12 @@ def printParents(Child):
     print(Child.name," Parents:")
     print(Child.parent)
 
-#accepts the array of nodes of specific child
-def getParents(childFromDictionary):
-    print("Get Parents")
-    # parents = []
-    # for i in range(0,len(childFromDictionary)):
-    #     # printParents(childFromDictionary[i])
-    #     parents.append(childFromDictionary[i].parent)
-    # for x in parents:
-    #     if(x.name != "Root" and x.amount >= 0):
-    #         # getParents(x)
-    #         # print(x.name," frequent: ",x)
-
 #sort transactions according to number of occurances
 def SortTransactions(Transaction):
     newTransaction = []
     for x in allowedItems:
         if x in Transaction:
             newTransaction.append(x)
-    # print("Old Transaction: ", Transaction)
-    # print("New Transaction: ",newTransaction)
     return newTransaction
 
 #create the fpGrowth tree
@@ -178,17 +165,20 @@ def findFrequentItemSets():
     global allowedItems
     reversedAllowedItems = allowedItems[::-1]
     #find lowest value node
-    print("rev: ", reversedAllowedItems)
-    find(reversedAllowedItems)
-
+    while reversedAllowedItems != []:
+        createSubTree(reversedAllowedItems[0])
+        del reversedAllowedItems[0]
+    print(frequentDictionary)
 def find(itemset):
+    temp = itemset
     s = []
     a = []
+    amount = -1
     if(itemset == []):
         return
-    current = itemset[0]
-    del itemset[0]
-    frequentItemSets.append(current)
+    current = temp[0]
+    del temp[0]
+    # frequentItemSets.append(current)
     for x in HeaderTable.get(current):
         s.append(addToSet(x,a))
         a = []
@@ -197,7 +187,21 @@ def find(itemset):
     else:
         Master = intersection(s[0],s[1])
     frequentItemSets.append(Master)
-    find(itemset)
+    # frequentDictionary[Master] = Master.amount
+    find(temp)
+
+
+def createSubTree(StartNode):
+    #get heads
+    heads = HeaderTable.get(StartNode)
+    for x in heads:
+        if x.name not in frequentDictionary:
+            frequentDictionary[x.name] = []
+        currentamount = x.amount
+        path = x.path
+        currentPath = frequentDictionary.get(x.name)
+        currentPath.append([path,currentamount])
+        frequentDictionary[x.name]=(currentPath)
 
 def addToSet(currentNode,listOfParents):
     if currentNode.name == "Root":
@@ -207,9 +211,6 @@ def addToSet(currentNode,listOfParents):
         addToSet(currentNode.parent,listOfParents)
         return listOfParents
 
-
-def extractPath(item):
-    print(item)
 
 #read the file into the count dictionary
 def readIntoDictionary(fileName):
