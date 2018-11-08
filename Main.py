@@ -1,6 +1,5 @@
 import sys, os.path
 from anytree import Node,RenderTree
-
 minSupport = -1
 numberOfLines = -1
 Root = Node("Root")
@@ -23,7 +22,7 @@ def Main():
     currentFile = readFile(arguments[1])
     minSupport = int((numberOfLines) * ((int) (arguments[2]) / 100))
     print("Minsup:", minSupport)
-    # Trim()
+    Trim()
     CreateHeaderTable()
     print(CountDictionary)
 
@@ -32,9 +31,9 @@ def Main():
     FPGrowth(arguments[1])
     print(RenderTree(Root))
     # print(HeaderTable)
-    for a in HeaderTable.keys():
-        getParents(HeaderTable.get(a))
-
+    # for a in HeaderTable.keys():
+        # getParents(HeaderTable.get(a))
+    print("Frequent: ",frequentItemSets)
 
 
 #get and manipulate arguemnts
@@ -149,10 +148,15 @@ def printParents(Child):
 
 #accepts the array of nodes of specific child
 def getParents(childFromDictionary):
-    for i in range(0,len(childFromDictionary)):
-        printParents(childFromDictionary[i])
-        print(childFromDictionary[i].amount)
-
+    print("Get Parents")
+    # parents = []
+    # for i in range(0,len(childFromDictionary)):
+    #     # printParents(childFromDictionary[i])
+    #     parents.append(childFromDictionary[i].parent)
+    # for x in parents:
+    #     if(x.name != "Root" and x.amount >= 0):
+    #         # getParents(x)
+    #         # print(x.name," frequent: ",x)
 
 #sort transactions according to number of occurances
 def SortTransactions(Transaction):
@@ -178,15 +182,35 @@ def findFrequentItemSets():
     find(reversedAllowedItems)
 
 def find(itemset):
+    s = []
+    a = []
     if(itemset == []):
         return
-    print(itemset)
-    if(CountDictionary[itemset[0]] < minSupport):
-        print("Deleting:",itemset[0])
-        del itemset[0]
-        find(itemset)
+    current = itemset[0]
+    del itemset[0]
+    frequentItemSets.append(current)
+    for x in HeaderTable.get(current):
+        s.append(addToSet(x,a))
+        a = []
+    if(len(s) == 1):
+       Master = s[0]
     else:
-        print("k")
+        Master = intersection(s[0],s[1])
+    frequentItemSets.append(Master)
+    find(itemset)
+
+def addToSet(currentNode,listOfParents):
+    if currentNode.name == "Root":
+        return listOfParents
+    else:
+        listOfParents.append(currentNode.name)
+        addToSet(currentNode.parent,listOfParents)
+        return listOfParents
+
+
+def extractPath(item):
+    print(item)
+
 #read the file into the count dictionary
 def readIntoDictionary(fileName):
     global numberOfLines
@@ -207,6 +231,9 @@ def readIntoTree(fileName):
         a = SortTransactions(a)
         CreateTree(a)
 
+def intersection(a,b):
+    cc = [value for value in a if value in b]
+    return cc
 
 
 
