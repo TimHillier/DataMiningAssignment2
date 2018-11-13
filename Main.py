@@ -1,5 +1,5 @@
 import sys, os.path
-from anytree import Node,RenderTree,search,
+from anytree import Node,RenderTree,search
 minSupport = -1
 numberOfLines = -1
 Root = Node("Root")
@@ -214,9 +214,8 @@ def createSubTree(StartNode):
     print("List for",StartNode)
     for x in heads:
         print("Ancesrs",x.ancestors)
-        print(commonancestors(x))
         print("fina",StartNode,"::",search.findall_by_attr(Root,StartNode))
-        thing(x,[])
+        frequentItemSets.append(thing(x,[]))
         # print("x",x)
         if x.parent.name == "Root":
             return
@@ -242,9 +241,10 @@ def thing(remainingNodes,CurrentPass):
         return CurrentPass #return the current path
     else:
         temp = remainingNodes
+        print("hello:",temp)
         CurrentPass.append(temp.name)
         thing(remainingNodes.parent,CurrentPass)
-
+    return CurrentPass
 
 
 
