@@ -1,5 +1,5 @@
 import sys, os.path
-from anytree import Node,RenderTree
+from anytree import Node,RenderTree,search,
 minSupport = -1
 numberOfLines = -1
 Root = Node("Root")
@@ -30,10 +30,7 @@ def Main():
     allowedItems = SortDictionary()
     print("Allowed: ", allowedItems)
     FPGrowth(arguments[1])
-    # print(RenderTree(Root))
-    # print(HeaderTable)
-    # for a in HeaderTable.keys():
-        # getParents(HeaderTable.get(a))
+    print(RenderTree(Root))
     print("Frequent: ",frequentItemSets)
 
 
@@ -138,17 +135,20 @@ def addNodes(approvedNodes, currntNode):
 
 #add node to header table
 def addToHeaderTable(NodeToAdd):
+    # print("AddtoHeaderTable")
     if(NodeToAdd.name in HeaderTable):
         x = HeaderTable[NodeToAdd.name]
         x.append(NodeToAdd)
         HeaderTable.update({NodeToAdd.name:x})
 
 def printParents(Child):
+    # print("PrintParents")
     print(Child.name," Parents:")
     print(Child.parent)
 
 #sort transactions according to number of occurances
 def SortTransactions(Transaction):
+    # print("SortTransactions")
     newTransaction = []
     for x in allowedItems:
         if x in Transaction:
@@ -157,19 +157,33 @@ def SortTransactions(Transaction):
 
 #create the fpGrowth tree
 def FPGrowth(fileName):
+    # print("FPGrowth")
     readIntoTree(fileName)
     findFrequentItemSets()
 
 #this might be wrong?
 def findFrequentItemSets():
+    # print("findFrequentItemsets")
     global allowedItems
     reversedAllowedItems = allowedItems[::-1]
     #find lowest value node
     while reversedAllowedItems != []:
         createSubTree(reversedAllowedItems[0])
         del reversedAllowedItems[0]
-    print(frequentDictionary)
+    print("Freq",frequentDictionary)
+    GenerateFreq()
+
+#Genereate frequent itemsets from the frequent dictionary
+def GenerateFreq():
+    # print("GenerateFreq")
+    keys = frequentDictionary.keys()
+
+    # print("gottem",frequentDictionary.get("l3")[2])
+
+
+#does something
 def find(itemset):
+    # print("Find")
     temp = itemset
     s = []
     a = []
@@ -192,18 +206,54 @@ def find(itemset):
 
 
 def createSubTree(StartNode):
+    # print("CreateSubTree")
     #get heads
+    # print("Start Node: ", StartNode)
     heads = HeaderTable.get(StartNode)
+    # print("Heads:", heads)
+    print("List for",StartNode)
     for x in heads:
+        print("Ancesrs",x.ancestors)
+        print(commonancestors(x))
+        print("fina",StartNode,"::",search.findall_by_attr(Root,StartNode))
+        thing(x,[])
+        # print("x",x)
+        if x.parent.name == "Root":
+            return
         if x.name not in frequentDictionary:
             frequentDictionary[x.name] = []
         currentamount = x.amount
-        path = x.path
+        pathName = []
+        for a in x.path:
+            if(a.name == "Root" or a.name == x.name):
+                print()
+            else:
+                pathName.append(a.name)
         currentPath = frequentDictionary.get(x.name)
-        currentPath.append([path,currentamount])
+        currentPath.append([pathName,currentamount])
+        # print(x.path)
         frequentDictionary[x.name]=(currentPath)
 
+
+def thing(remainingNodes,CurrentPass):
+    # print("Remaining: ,",remainingNodes)
+    if remainingNodes.name == "Root":
+        print("Current Pass: ",CurrentPass)
+        return CurrentPass #return the current path
+    else:
+        temp = remainingNodes
+        CurrentPass.append(temp.name)
+        thing(remainingNodes.parent,CurrentPass)
+
+
+
+
+
+
+
+
 def addToSet(currentNode,listOfParents):
+    # print("addtoset")
     if currentNode.name == "Root":
         return listOfParents
     else:
@@ -214,6 +264,7 @@ def addToSet(currentNode,listOfParents):
 
 #read the file into the count dictionary
 def readIntoDictionary(fileName):
+    # print("ReadIntoDictionary")
     global numberOfLines
     file = open(fileName, "r")
     numberOfLines = int(file.readline())
@@ -232,6 +283,7 @@ def readIntoTree(fileName):
         a = SortTransactions(a)
         CreateTree(a)
 
+#returns the intesection of two sets
 def intersection(a,b):
     cc = [value for value in a if value in b]
     return cc

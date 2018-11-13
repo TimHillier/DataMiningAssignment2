@@ -1,0 +1,6 @@
+5
+1   4   beer    bread   butter  milk
+2   3   beer    butter   milk
+3   3   beer    milk    cheese
+4   4   beer    butter  diapers cheese
+5   3   beer    cheese  bread
