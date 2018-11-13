@@ -1,5 +1,5 @@
 import sys, os.path
-from anytree import Node,RenderTree,search
+from anytree import Node,RenderTree
 minSupport = -1
 numberOfLines = -1
 Root = Node("Root")
@@ -12,6 +12,7 @@ frequentDictionary = {}
 CountDictionary = {}
 #make the header table a dictionary?
 HeaderTable = {}
+testSet = []
 
 
 
@@ -32,6 +33,8 @@ def Main():
     FPGrowth(arguments[1])
     print(RenderTree(Root))
     print("Frequent: ",frequentItemSets)
+    print("test: ",testSet)
+
 
 
 #get and manipulate arguemnts
@@ -212,10 +215,11 @@ def createSubTree(StartNode):
     heads = HeaderTable.get(StartNode)
     # print("Heads:", heads)
     print("List for",StartNode)
+    currentList = []
     for x in heads:
-        print("Ancesrs",x.ancestors)
-        print("fina",StartNode,"::",search.findall_by_attr(Root,StartNode))
-        frequentItemSets.append(thing(x,[]))
+        b = thing(x,[])
+        currentList.append(b)
+        frequentItemSets.append(b)
         # print("x",x)
         if x.parent.name == "Root":
             return
@@ -224,16 +228,24 @@ def createSubTree(StartNode):
         currentamount = x.amount
         pathName = []
         for a in x.path:
-            if(a.name == "Root" or a.name == x.name):
+            if(a.name == "Root"):# or a.name == x.name):
                 print()
             else:
                 pathName.append(a.name)
+                print("path",pathName)
         currentPath = frequentDictionary.get(x.name)
         currentPath.append([pathName,currentamount])
         # print(x.path)
         frequentDictionary[x.name]=(currentPath)
+    print("Intersection")
+    for i in range(0,len(currentList)-1):
+        for k in range(1,len(currentList)):
+            test = (intersection(currentList[i],currentList[k]))
+            if test not in testSet:
+                testSet.append(test)
 
 
+#this does important stuff
 def thing(remainingNodes,CurrentPass):
     # print("Remaining: ,",remainingNodes)
     if remainingNodes.name == "Root":
@@ -242,7 +254,8 @@ def thing(remainingNodes,CurrentPass):
     else:
         temp = remainingNodes
         print("hello:",temp)
-        CurrentPass.append(temp.name)
+        if temp.amount >= minSupport:
+            CurrentPass.append(temp.name)
         thing(remainingNodes.parent,CurrentPass)
     return CurrentPass
 
