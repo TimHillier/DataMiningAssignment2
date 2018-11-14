@@ -1,4 +1,4 @@
-import sys, os.path
+import sys, os.path,itertools
 from anytree import Node,RenderTree
 minSupport = -1
 numberOfLines = -1
@@ -29,12 +29,12 @@ def Main():
     print(CountDictionary)
 
     allowedItems = SortDictionary()
-    print("Allowed: ", allowedItems)
+    # print("Allowed: ", allowedItems)
     FPGrowth(arguments[1])
     print(RenderTree(Root))
-    print("Frequent: ",frequentItemSets)
-    print("test: ",testSet)
-    print("Header: ",HeaderTable)
+    print("Frequent: ",frequentDictionary)
+    # print("test: ",testSet)
+    # print("Header: ",HeaderTable)
 
 
 #get and manipulate arguemnts
@@ -174,7 +174,7 @@ def findFrequentItemSets():
         createSubTree(reversedAllowedItems[0])
         GenerateFreq(reversedAllowedItems[0])
         del reversedAllowedItems[0]
-    print("Freq",frequentDictionary)
+    # print("Freq",frequentDictionary)
 
 #Genereate frequent itemsets from the frequent dictionary
 def GenerateFreq(_node):
@@ -182,15 +182,77 @@ def GenerateFreq(_node):
     print("Generate Freq",_node)
     for x in HeaderTable.get(_node):
         list.append(addPathToList(x,[]))
-    CalcFrequent(list,[])
-    print("list",list)
+    CalcFrequent(list,[],_node)
+    # print("list",list)
     print(HeaderTable.get(_node))
 
-def CalcFrequent(List,frequents):
+#calculates the frequent patterns
+def CalcFrequent(List,frequents,name):
     print("Calc Frequent")
-    if frequents == []:
-        frequents.append(List[0][0])
-    # for x in List:
+    toLookFor = getPermutations(List)
+    toLookFor = clean(toLookFor,name)
+    for y in toLookFor:
+        counter = 0
+        for x in List:
+            if DoesItAppear(y,x):
+                # print("Found",y, "in",x)
+                counter +=1
+
+        fromDictionary = frequentDictionary.get(y[0])
+        if fromDictionary != None:
+            for k in range(0,len(fromDictionary)):
+                if set(list(y)) == set(fromDictionary[k][0]) and fromDictionary[k][1] > 1:
+                    counter += fromDictionary[k][1]
+                    print("added",fromDictionary[k][1],"to ",y)
+                    print(list(y) ,"is in")
+
+
+        # if(set(list(y)) in )
+
+
+
+        # if list(y) in fromDictionary:
+        #     print("yes")
+
+
+
+        if counter >= minSupport:
+            print(y,"Found",counter,"Times")
+            frequentDictionary
+
+def clean(TheSet,name):
+    L = list(TheSet)
+    remove = []
+    if(len(L) >0):
+        for i in range(0,len(L)):
+            if name not in L[i]:
+                remove.append(i)
+    remove.reverse()
+    for x in remove:
+        del L[x]
+    return L
+
+
+
+#returns a set of permutations to search for
+def getPermutations(l):
+    if len(l) == 1:
+        return l
+    perms = []
+    for x in l:
+        for b in range(1,len(x)+1):
+            a =list(itertools.combinations(x,b))
+            perms.append(a)
+    temp = [item for sublist in perms for item in sublist]
+    perms = set(temp)
+    return perms
+
+
+
+#returns true if tofind is a subset of tolook
+def DoesItAppear(tofind,tolook):
+    return set(tofind).issubset(tolook)
+    # return set(tofind) < set(tolook)
 
 
 def addPathToList(node,list):
