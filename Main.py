@@ -34,7 +34,7 @@ def Main():
     print(RenderTree(Root))
     print("Frequent: ",frequentItemSets)
     print("test: ",testSet)
-
+    print("Header: ",HeaderTable)
 
 
 #get and manipulate arguemnts
@@ -172,18 +172,34 @@ def findFrequentItemSets():
     #find lowest value node
     while reversedAllowedItems != []:
         createSubTree(reversedAllowedItems[0])
+        GenerateFreq(reversedAllowedItems[0])
         del reversedAllowedItems[0]
     print("Freq",frequentDictionary)
-    GenerateFreq()
 
 #Genereate frequent itemsets from the frequent dictionary
-def GenerateFreq():
-    # print("GenerateFreq")
-    keys = frequentDictionary.keys()
+def GenerateFreq(_node):
+    list = []
+    print("Generate Freq",_node)
+    for x in HeaderTable.get(_node):
+        list.append(addPathToList(x,[]))
+    CalcFrequent(list,[])
+    print("list",list)
+    print(HeaderTable.get(_node))
 
-    # print("gottem",frequentDictionary.get("l3")[2])
+def CalcFrequent(List,frequents):
+    print("Calc Frequent")
+    if frequents == []:
+        frequents.append(List[0][0])
+    # for x in List:
 
 
+def addPathToList(node,list):
+    if node.name == "Root":
+        return list
+    else:
+        list.append(node.name)
+        addPathToList(node.parent,list)
+    return list
 #does something
 def find(itemset):
     # print("Find")
@@ -214,7 +230,7 @@ def createSubTree(StartNode):
     # print("Start Node: ", StartNode)
     heads = HeaderTable.get(StartNode)
     # print("Heads:", heads)
-    print("List for",StartNode)
+    # print("List for",StartNode)
     currentList = []
     for x in heads:
         b = thing(x,[])
@@ -232,28 +248,21 @@ def createSubTree(StartNode):
                 print()
             else:
                 pathName.append(a.name)
-                print("path",pathName)
+                # print("path",pathName)
         currentPath = frequentDictionary.get(x.name)
         currentPath.append([pathName,currentamount])
         # print(x.path)
         frequentDictionary[x.name]=(currentPath)
-    print("Intersection")
-    for i in range(0,len(currentList)-1):
-        for k in range(1,len(currentList)):
-            test = (intersection(currentList[i],currentList[k]))
-            if test not in testSet:
-                testSet.append(test)
-
 
 #this does important stuff
 def thing(remainingNodes,CurrentPass):
     # print("Remaining: ,",remainingNodes)
     if remainingNodes.name == "Root":
-        print("Current Pass: ",CurrentPass)
+        # print("Current Pass: ",CurrentPass)
         return CurrentPass #return the current path
     else:
         temp = remainingNodes
-        print("hello:",temp)
+        # print("hello:",temp)
         if temp.amount >= minSupport:
             CurrentPass.append(temp.name)
         thing(remainingNodes.parent,CurrentPass)
