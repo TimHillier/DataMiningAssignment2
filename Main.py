@@ -1,5 +1,6 @@
-import sys, os.path,itertools
+import sys, os.path,itertools,timeit
 from anytree import Node,RenderTree
+from progress.bar import Bar
 minSupport = -1
 numberOfLines = -1
 Root = Node("Root")
@@ -14,32 +15,24 @@ CountDictionary = {}
 #make the header table a dictionary?
 HeaderTable = {}
 testSet = []
-UsedMethods = []
 
 
 
 
 #Main Runner of the code
 def Main():
+    start = timeit.timeit()
     global minSupport,allowedItems
     arguments = GetArguments()
     currentFile = readFile(arguments[1])
     minSupport = int((numberOfLines) * ((int) (arguments[2]) / 100))
-    print("Minsup:", minSupport)
     Trim()
     CreateHeaderTable()
-    print(CountDictionary)
-
     allowedItems = SortDictionary()
-    # print("Allowed: ", allowedItems)
     FPGrowth(arguments[1])
-    # print(RenderTree(Root))
-    # print("Frequent: ",frequentItemSets)
-    # print("test: ",testSet)
-    # print("Header: ",HeaderTable)
-    print(answer)
-    print(set(UsedMethods))
-
+    end = timeit.timeit()
+    OutPutToFile(answer,"MiningResult")
+    print("Time Ellapsed:", end-start)
 #get and manipulate arguemnts
 def GetArguments():
     return sys.argv
@@ -286,5 +279,15 @@ def readIntoTree(fileName):
         a = a[2:]
         a = SortTransactions(a)
         CreateTree(a)
+
+#create output files for the tests
+def OutPutToFile(fileToOut,FileName):
+    file = open(FileName+".txt","w+")
+    file.write("|FPs|=%d\n" % len(fileToOut))
+    for fp,amt in fileToOut.items():
+        file.write(str(fp)+":"+str(amt)+"\n")
+    # write to file
+    file.close()
+
 
 Main()
