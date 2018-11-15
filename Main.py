@@ -7,12 +7,14 @@ lastNode = Root
 listOfNodes = []
 allowedItems = []
 frequentItemSets = []
+answer = {}
 frequentDictionary = {}
 #dictionary to store the amount:
 CountDictionary = {}
 #make the header table a dictionary?
 HeaderTable = {}
 testSet = []
+UsedMethods = []
 
 
 
@@ -31,11 +33,12 @@ def Main():
     allowedItems = SortDictionary()
     # print("Allowed: ", allowedItems)
     FPGrowth(arguments[1])
-    print(RenderTree(Root))
-    print("Frequent: ",frequentDictionary)
+    # print(RenderTree(Root))
+    # print("Frequent: ",frequentItemSets)
     # print("test: ",testSet)
     # print("Header: ",HeaderTable)
-
+    print(answer)
+    print(set(UsedMethods))
 
 #get and manipulate arguemnts
 def GetArguments():
@@ -51,7 +54,6 @@ def readFile(fileName):
 
 #check the dictionary and if they exist increase counter else ignore
 def CheckDictionary(Elements):
-
     for i in range (0,len(Elements)):
         if(not (Elements[i] in CountDictionary)):
             #if not in the dictionary add it
@@ -102,15 +104,11 @@ def CreateTree(Transaction):
     addNodes(approved,current)
 
 def findLowest(approvedNodes,currntNode):
-    # print("approved: ",approvedNodes)
     lowestNode = currntNode
     if approvedNodes == []:
-        # print("X")
         return lowestNode
     if currntNode.children == []:
-        # print("Y")
         return lowestNode
-    # print(currntNode.name," Children:", currntNode.children)
     for i in range(0,len(currntNode.children)):
         if(currntNode.children[i].name == approvedNodes[0]):
             del approvedNodes[0]
@@ -138,20 +136,13 @@ def addNodes(approvedNodes, currntNode):
 
 #add node to header table
 def addToHeaderTable(NodeToAdd):
-    # print("AddtoHeaderTable")
     if(NodeToAdd.name in HeaderTable):
         x = HeaderTable[NodeToAdd.name]
         x.append(NodeToAdd)
         HeaderTable.update({NodeToAdd.name:x})
 
-def printParents(Child):
-    # print("PrintParents")
-    print(Child.name," Parents:")
-    print(Child.parent)
-
 #sort transactions according to number of occurances
 def SortTransactions(Transaction):
-    # print("SortTransactions")
     newTransaction = []
     for x in allowedItems:
         if x in Transaction:
@@ -160,13 +151,11 @@ def SortTransactions(Transaction):
 
 #create the fpGrowth tree
 def FPGrowth(fileName):
-    # print("FPGrowth")
     readIntoTree(fileName)
     findFrequentItemSets()
 
 #this might be wrong?
 def findFrequentItemSets():
-    # print("findFrequentItemsets")
     global allowedItems
     reversedAllowedItems = allowedItems[::-1]
     #find lowest value node
@@ -179,46 +168,29 @@ def findFrequentItemSets():
 #Genereate frequent itemsets from the frequent dictionary
 def GenerateFreq(_node):
     list = []
-    print("Generate Freq",_node)
     for x in HeaderTable.get(_node):
         list.append(addPathToList(x,[]))
     CalcFrequent(list,[],_node)
-    # print("list",list)
-    print(HeaderTable.get(_node))
 
 #calculates the frequent patterns
 def CalcFrequent(List,frequents,name):
-    print("Calc Frequent")
     toLookFor = getPermutations(List)
     toLookFor = clean(toLookFor,name)
     for y in toLookFor:
         counter = 0
         for x in List:
             if DoesItAppear(y,x):
-                # print("Found",y, "in",x)
                 counter +=1
 
         fromDictionary = frequentDictionary.get(y[0])
-        if fromDictionary != None:
-            for k in range(0,len(fromDictionary)):
-                if set(list(y)) == set(fromDictionary[k][0]) and fromDictionary[k][1] > 1:
-                    counter += fromDictionary[k][1]
-                    print("added",fromDictionary[k][1],"to ",y)
-                    print(list(y) ,"is in")
-
-
-        # if(set(list(y)) in )
-
-
-
-        # if list(y) in fromDictionary:
-        #     print("yes")
-
-
-
+        for k in range(0,len(fromDictionary)):
+            if set(list(y)) == set(fromDictionary[k][0]) and fromDictionary[k][1] > 1:
+                counter += fromDictionary[k][1] - 1
         if counter >= minSupport:
-            print(y,"Found",counter,"Times")
-            frequentDictionary
+            if type(y) != 'tuple':
+                y = tuple(y)
+            answer[y]=counter
+
 
 def clean(TheSet,name):
     L = list(TheSet)
@@ -252,7 +224,6 @@ def getPermutations(l):
 #returns true if tofind is a subset of tolook
 def DoesItAppear(tofind,tolook):
     return set(tofind).issubset(tolook)
-    # return set(tofind) < set(tolook)
 
 
 def addPathToList(node,list):
@@ -262,93 +233,42 @@ def addPathToList(node,list):
         list.append(node.name)
         addPathToList(node.parent,list)
     return list
-#does something
-def find(itemset):
-    # print("Find")
-    temp = itemset
-    s = []
-    a = []
-    amount = -1
-    if(itemset == []):
-        return
-    current = temp[0]
-    del temp[0]
-    # frequentItemSets.append(current)
-    for x in HeaderTable.get(current):
-        s.append(addToSet(x,a))
-        a = []
-    if(len(s) == 1):
-       Master = s[0]
-    else:
-        Master = intersection(s[0],s[1])
-    frequentItemSets.append(Master)
-    # frequentDictionary[Master] = Master.amount
-    find(temp)
 
 
 def createSubTree(StartNode):
-    # print("CreateSubTree")
-    #get heads
-    # print("Start Node: ", StartNode)
     heads = HeaderTable.get(StartNode)
-    # print("Heads:", heads)
-    # print("List for",StartNode)
     currentList = []
     for x in heads:
         b = thing(x,[])
         currentList.append(b)
         frequentItemSets.append(b)
-        # print("x",x)
-        if x.parent.name == "Root":
-            return
         if x.name not in frequentDictionary:
             frequentDictionary[x.name] = []
         currentamount = x.amount
         pathName = []
         for a in x.path:
             if(a.name == "Root"):# or a.name == x.name):
-                print()
+                print("")
             else:
                 pathName.append(a.name)
-                # print("path",pathName)
         currentPath = frequentDictionary.get(x.name)
         currentPath.append([pathName,currentamount])
-        # print(x.path)
         frequentDictionary[x.name]=(currentPath)
 
-#this does important stuff
+#this does something idk
 def thing(remainingNodes,CurrentPass):
-    # print("Remaining: ,",remainingNodes)
     if remainingNodes.name == "Root":
-        # print("Current Pass: ",CurrentPass)
         return CurrentPass #return the current path
     else:
         temp = remainingNodes
-        # print("hello:",temp)
         if temp.amount >= minSupport:
             CurrentPass.append(temp.name)
         thing(remainingNodes.parent,CurrentPass)
     return CurrentPass
 
 
-
-
-
-
-
-def addToSet(currentNode,listOfParents):
-    # print("addtoset")
-    if currentNode.name == "Root":
-        return listOfParents
-    else:
-        listOfParents.append(currentNode.name)
-        addToSet(currentNode.parent,listOfParents)
-        return listOfParents
-
-
 #read the file into the count dictionary
 def readIntoDictionary(fileName):
-    # print("ReadIntoDictionary")
     global numberOfLines
     file = open(fileName, "r")
     numberOfLines = int(file.readline())
@@ -366,15 +286,5 @@ def readIntoTree(fileName):
         a = a[2:]
         a = SortTransactions(a)
         CreateTree(a)
-
-#returns the intesection of two sets
-def intersection(a,b):
-    cc = [value for value in a if value in b]
-    return cc
-
-
-
-
-
 
 Main()
