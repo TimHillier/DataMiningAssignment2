@@ -26,13 +26,20 @@ def Main():
     arguments = GetArguments()
     currentFile = readFile(arguments[1])
     minSupport = int((numberOfLines) * ((int) (arguments[2]) / 100))
-    Trim()
+    print("Min Support: ",minSupport)
+    Trim() #what do you do here?
+    print("Trimmed")
     CreateHeaderTable()
+    print("Created Header table:",HeaderTable)
     allowedItems = SortDictionary()
+    print("Allowed Items:",allowedItems)
     FPGrowth(arguments[1])
+    print("FP Growthed")
+    print(RenderTree(Root))
     end = timeit.timeit()
     OutPutToFile(answer,"MiningResult")
     print("Time Ellapsed:", end-start)
+
 #get and manipulate arguemnts
 def GetArguments():
     return sys.argv
@@ -144,8 +151,12 @@ def SortTransactions(Transaction):
 
 #create the fpGrowth tree
 def FPGrowth(fileName):
+    print("Reading Into Tree")
     readIntoTree(fileName)
+    print("Read Into Tree, Generating Frequent Itemsets")
+    # print(RenderTree(Root))
     findFrequentItemSets()
+    print("Found Frequent Itemsets")
 
 #this might be wrong?
 def findFrequentItemSets():
@@ -241,7 +252,7 @@ def createSubTree(StartNode):
         pathName = []
         for a in x.path:
             if(a.name == "Root"):# or a.name == x.name):
-                print("")
+                pass
             else:
                 pathName.append(a.name)
         currentPath = frequentDictionary.get(x.name)
