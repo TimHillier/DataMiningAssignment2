@@ -1,0 +1,11 @@
+10
+1   2   apricots bread
+2   3   bread carrots dumplings
+3   4   apricots carrots dumplings eggs
+4   3   apricots dumplings eggs
+5   3   apricots bread carrots
+6   4   apricots bread carrots dumplings
+7   1   apricots
+8   3   apricots bread carrots
+9   3   apricots bread dumplings
+10  3   bread carrots eggs

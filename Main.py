@@ -1,6 +1,8 @@
-import sys, os.path,itertools,timeit
+import sys, os.path,itertools,timeit,threading,time
 from anytree import Node,RenderTree
 from progress.bar import Bar
+from progress.spinner import Spinner
+import pyfpgrowth
 minSupport = -1
 numberOfLines = -1
 Root = Node("Root")
@@ -15,17 +17,21 @@ CountDictionary = {}
 #make the header table a dictionary?
 HeaderTable = {}
 testSet = []
+state = False
 
 
 
 
 #Main Runner of the code
 def Main():
+    # spinner = Spinner('Working')
+
     start = timeit.timeit()
-    global minSupport,allowedItems
+    global minSupport,allowedItems,state
     arguments = GetArguments()
     currentFile = readFile(arguments[1])
     minSupport = int((numberOfLines) * ((int) (arguments[2]) / 100))
+    addToAnswer()
     print("Min Support: ",minSupport)
     Trim() #what do you do here?
     print("Trimmed")
@@ -37,9 +43,18 @@ def Main():
     print("FP Growthed")
     print(RenderTree(Root))
     end = timeit.timeit()
+    print("Answer", answer)
     OutPutToFile(answer,"MiningResult")
+    state = True
     print("Time Ellapsed:", end-start)
 
+#add singletons to answer
+def addToAnswer():
+    for x in CountDictionary:
+        if CountDictionary.get(x) >= minSupport:
+            print(CountDictionary.get(x),"is greater than",minSupport)
+            a = tuple(x)
+            answer[a]=(CountDictionary.get(x))
 #get and manipulate arguemnts
 def GetArguments():
     return sys.argv
@@ -189,7 +204,9 @@ def CalcFrequent(List,frequents,name):
         fromDictionary = frequentDictionary.get(y[0])
         for k in range(0,len(fromDictionary)):
             if set(list(y)) == set(fromDictionary[k][0]) and fromDictionary[k][1] > 1:
-                counter += fromDictionary[k][1] - 1
+                # print("Adding",fromDictionary[k][1], "To",counter)
+                counter += fromDictionary[k][1]
+                # print("new count: ",counter)
         if counter >= minSupport:
             if type(y) != 'tuple':
                 y = tuple(y)
@@ -223,6 +240,18 @@ def getPermutations(l):
     perms = set(temp)
     return perms
 
+def working():
+    # spinner = Spinner('Mining ')
+    bar = Bar('Mining',max = 100)
+    for i in range(100):
+        time.sleep(1)
+        if i == 99 and not state:
+            i -=1
+        bar.next()
+    bar.finish()
+    # while state != True:
+        # time.sleep(1)
+        # spinner.next
 
 
 #returns true if tofind is a subset of tolook
@@ -300,5 +329,12 @@ def OutPutToFile(fileToOut,FileName):
     # write to file
     file.close()
 
-
+# try:
+#
+#     threading.Thread(target=working()).start()
+#     threading.Thread(target=Main()).start()
+# except:
+#     print("Error: unable to start")
+# while 1:
+#     pass
 Main()
